@@ -13,8 +13,9 @@ import IOKit
 public class IORecursiveIterator {
     private var child: io_registry_entry_t
     private var iterator: io_iterator_t
-    private let plane: IOPlane
     private var memEntry: IOEntry? = nil
+    
+    public let plane: IOPlane
     
     //private let matching: CFDictionary = IOServiceMatching(kIOServicePlane)
     
@@ -43,38 +44,20 @@ public class IORecursiveIterator {
             return memEntry
         }
         
-        let pathName = UnsafeMutablePointer<io_string_t>.allocate(capacity: 1);
-                            
-        let int8NamePointer = UnsafeMutableRawPointer(pathName).bindMemory(to: Int8.self,capacity: 1)
-                            
-        if IORegistryEntryGetPath(child, self.plane.iOKitName, int8NamePointer) != kIOReturnSuccess{
+        guard let entryPath = child.getPath(relativeTo: self.plane) else{
             return nil
         }
         
-        memEntry = IOEntry(fromRegistryPath: String(cString: int8NamePointer), options: IOOptionBits(kIORegistryIterateRecursively))
+        memEntry = IOEntry(fromRegistryPath: entryPath, options: IOOptionBits(kIORegistryIterateRecursively), plane: plane)
         
         return memEntry
     }
-    
     
     public func next() -> Bool{
         child = IOIteratorNext(iterator)
         memEntry = nil
         
         return child != 0
-    }
-    
-    public func parentIterator(inPlane plane: IOPlane) -> Self{
-        
-        var iter: io_iterator_t = 0
-        
-        IORegistryEntryGetParentIterator(child, plane.iOKitName, &iter)
-        
-        return Self.init(child: 0, iterator: iter, plane: plane, reset: false)
-    }
-    
-    public func parentIterator() -> Self{
-        return parentIterator(inPlane: self.plane)
     }
     
     public func parent() -> io_registry_entry_t?{

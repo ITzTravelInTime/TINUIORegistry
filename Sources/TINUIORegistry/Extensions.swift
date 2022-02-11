@@ -84,3 +84,43 @@ internal extension String{
     }
     
 }
+
+#if os(macOS)
+
+import IOKit
+
+public extension io_registry_entry_t{
+    func getPath(relativeTo plane: IOPlane) -> String?{
+        let pathName = UnsafeMutablePointer<io_string_t>.allocate(capacity: 1);
+                            
+        let int8NamePointer = UnsafeMutableRawPointer(pathName).bindMemory(to: Int8.self,capacity: 1)
+                            
+        if IORegistryEntryGetPath(self, plane.iOKitName, int8NamePointer) != kIOReturnSuccess{
+            return nil
+        }
+        
+        return String(cString: int8NamePointer)
+    }
+    
+    func getParentEntry(relativeTo plane: IOPlane) -> Self?{
+        var entry: io_registry_entry_t = 0
+        
+        if IORegistryEntryGetParentEntry(self, plane.iOKitName, &entry) != kIOReturnSuccess{
+            return nil
+        }
+        
+        return entry
+    }
+    
+    func getFirstChildEntry(relativeTo plane: IOPlane) -> Self?{
+        var entry: io_registry_entry_t = 0
+        
+        if IORegistryEntryGetChildEntry(self, plane.iOKitName, &entry) != kIOReturnSuccess{
+            return nil
+        }
+        
+        return entry
+    }
+}
+
+#endif
