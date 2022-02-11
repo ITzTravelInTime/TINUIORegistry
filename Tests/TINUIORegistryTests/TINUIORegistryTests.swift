@@ -1,11 +1,11 @@
 import XCTest
-@testable import TINUIOKit
+@testable import TINUIORegistry
 
-final class TINUIOKitTests: XCTestCase {
+final class TINUIORegistryTests: XCTestCase {
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(TINUIOKit().text, "Hello, World!")
+        //XCTAssertEqual(TINUIOKit().text, "Hello, World!")
     }
 }
