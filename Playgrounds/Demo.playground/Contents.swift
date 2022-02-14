@@ -12,21 +12,19 @@ while iterator.next(){
         continue
     }
     
-    guard var name = entry.getStringData(forKey: "name") else{
+    guard let name = entry.getName() else{
         continue
     }
-    
-    name.removeLast()
     
     //print(name)
     
-    if name != "PNP0B00"{
+    if name != "TMR"{
         continue
     }
     
-    guard let memory = entry.getProperty(forKey: "IODeviceMemory") as? [[[String: UInt]]] else{
-        continue
+    for i in entry.getPropertyTable() ?? [:]{
+        print(i)
     }
     
-    print(memory)
+    break
 }

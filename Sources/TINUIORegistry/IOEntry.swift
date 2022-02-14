@@ -22,11 +22,16 @@ public class IOEntry{
     
     public convenience init?(fromRegistryPath path: String, options: IOOptionBits = 0, plane: IOPlane = .service){
         let entry = IORegistryEntryFromPath(IOServiceGetMatchingService(kIOMasterPortDefault, nil), path)
+        
+        if entry == MACH_PORT_NULL{
+            return nil
+        }
+        
         self.init(value: entry, options: options, plane: plane)
     }
     
     internal required init?(value: io_registry_entry_t, options: IOOptionBits = 0, avoidRelease: Bool = false, plane: IOPlane = .service) {
-        if value == 0{
+        if value == 0 || value == MACH_PORT_NULL{
             return nil
         }
         
@@ -41,7 +46,7 @@ public class IOEntry{
         }
     }
     
-    public func getName(usingPlane: Bool = false) -> String?{
+    public func getEntryName(usingPlane: Bool = false) -> String?{
         let pathName = UnsafeMutablePointer<io_string_t>.allocate(capacity: 1);
                             
         let int8NamePointer = UnsafeMutableRawPointer(pathName).bindMemory(to: Int8.self,capacity: 1)
@@ -58,6 +63,44 @@ public class IOEntry{
         
         return String(cString: int8NamePointer)
     }
+    
+    public func getNameProperty() -> String?{
+        if var name = getString(forKey: "name"){
+            if name.last == "\0"{
+                name.removeLast()
+            }
+            
+            return name
+        }
+        
+        if var name = getStringData(forKey: "name"){
+            if name.last == "\0"{
+                name.removeLast()
+            }
+            
+            return name
+        }
+        
+        return nil
+    }
+    
+    public func getName() -> String?{
+        if let name = getEntryName(){
+            return name
+        }
+        
+        if let name = getEntryName(usingPlane: true){
+            return name
+        }
+        
+        if let name = getNameProperty(){
+            return name
+        }
+        
+        return nil
+    }
+    
+    
     
     public func getPath() -> String?{
         return value.getPath(relativeTo: plane)
@@ -105,13 +148,39 @@ public class IOEntry{
         return memChild
     }
     
+    public func getPropertyTable() -> [String: Any]?{
+        var tdict: Unmanaged<CFMutableDictionary>? = nil
+        
+        if IORegistryEntryCreateCFProperties(value, &tdict, kCFAllocatorDefault, options) != kIOReturnSuccess{
+            return nil
+        }
+        
+        guard let dictionary: NSDictionary = tdict?.takeRetainedValue() else{
+            //tdict?.release()
+            return nil
+        }
+        
+        var ret: [String: Any] = [:]
+        
+        for (_, obj) in dictionary.enumerated(){
+            ret["\(obj.key)"] = obj.value
+        }
+        
+        //tdict?.release()
+        return ret
+    }
+    
     ///reads a generic property from the entry
     public func getProperty(forKey key: String) -> CFTypeRef?{
         guard let property = IORegistryEntryCreateCFProperty(self.value, NSString(string: key), kCFAllocatorDefault, options) else{
             return nil
         }
         
-        return property.takeRetainedValue()
+        let ret: CFTypeRef? = property.takeRetainedValue()
+        
+        property.release()
+        
+        return ret
     }
     
     public func getTypeProperties<T: CFTypeRef>(forKeys keys: [String]) -> [String: T]?{
