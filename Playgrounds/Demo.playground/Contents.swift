@@ -2,7 +2,7 @@ import Foundation
 import TINUIORegistry
 
 print(TINUIORegistry.IONVRAM.getString(forKey: "boot-args") ?? "[Fail]")
-print(TINUIORegistry.IODeviceTreeDisk.simpleList())
+//print(TINUIORegistry.IODeviceTreeDisk.simpleList())
 
 let iterator = IORecursiveIterator(plane: .service)
 
@@ -12,13 +12,13 @@ while iterator.next(){
         continue
     }
     
-    guard let name = entry.getName() else{
+    guard let name = entry.getEntryName() else{
         continue
     }
     
     //print(name)
     
-    if name != "TMR"{
+    if name != "TMR" && name != "RTC"{
         continue
     }
     

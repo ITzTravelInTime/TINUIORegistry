@@ -155,10 +155,13 @@ public class IOEntry{
             return nil
         }
         
-        guard let dictionary: NSDictionary = tdict?.takeRetainedValue() else{
+        guard let dict: NSDictionary = tdict?.takeRetainedValue() else{
             //tdict?.release()
             return nil
         }
+        
+        let dictionary = dict//NSDictionary(dictionary: dict)
+        //tdict?.release()
         
         var ret: [String: Any] = [:]
         
@@ -166,7 +169,6 @@ public class IOEntry{
             ret["\(obj.key)"] = obj.value
         }
         
-        //tdict?.release()
         return ret
     }
     
@@ -176,9 +178,9 @@ public class IOEntry{
             return nil
         }
         
-        let ret: CFTypeRef? = property.takeRetainedValue()
+        let ret: CFTypeRef? = property.takeRetainedValue()//.copy() as CFTypeRef
         
-        property.release()
+        //property.release()
         
         return ret
     }
@@ -209,7 +211,11 @@ public class IOEntry{
     
     ///Gets a data property from the entry
     public func getData(forKey key: String) -> Data?{
-        guard let data = getProperty(forKey: key) as? NSData else{
+        guard let obj = getProperty(forKey: key) else{
+            return nil
+        }
+        
+        guard let data = obj as? NSData else{
             return nil
         }
         
@@ -217,7 +223,11 @@ public class IOEntry{
     }
 
     public func getString(forKey key: String) -> String?{
-        guard let str = getProperty(forKey: key) as? NSString else{
+        guard let obj = getProperty(forKey: key) else{
+            return nil
+        }
+        
+        guard let str = obj as? NSString else{
             return nil
         }
         
