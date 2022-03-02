@@ -3,7 +3,92 @@ A Swift library to access information from the IORegistry.
 
 # Features and usage
 
-To be added.
+**Reding the NVRAM:**
+
+This feature allows you to access the system NVRAM to gather values, here is an exmaple: 
+
+(WARNING: This feature might not work with sandboxed apps)
+
+```swift
+import TINUIORegistry
+
+let boot_args = TINUIORegistry.IONVRAM.getString(forKey: "boot-args") ?? "[Fail]"
+
+print(boot_args)
+
+```
+
+**Getting a list of disks and partitions with some info:**
+
+This feature allows you to get a list of disks and patitions taken from the IORegistry.
+
+This example lists all the BSD names of available disks and partitions: 
+
+```swift
+import TINUIORegistry
+
+let list = TINUIORegistry.IODeviceTreeDisk.simpleList()
+
+for item in list{
+    print(item.DeviceIdentifier.rawValue)
+}
+
+```
+
+**Iterating trought the IORegistry entries**
+
+This feature allows for recursive iteration trought the IORegistry tree structure entry by entry.
+
+In this example it's used to find the RTC entry (for an intel mac) and then prints it's property table:
+
+```swift
+import TINUIORegistry
+
+let iterator = IORecursiveIterator(plane: .service) // creates an iterator object
+
+while iterator.next(){ //executes the iterations
+    
+    guard let entry = iterator.entry else{ //Tries to get the current registry entry pointed by the iterator.
+        continue
+    }
+    
+    guard let name = entry.getName() else{ //Gets the name of the obtained entry
+        continue
+    }
+    
+    //print(name)
+    
+    if name != "TMR" && name != "RTC" && name != "RTC0" && name != "RTC1"{ //checks if the entry name is that of the RTC device
+        continue
+    }
+    
+    //gets and prints the property table of the entry
+    for i in entry.getPropertyTable() ?? [:]{
+        print(i)
+    }
+    
+    break //exits from the loop
+}
+
+```
+
+**Using specific IORegistry entries**
+
+It's possible to interact with registry entries by initializing a new `IOEntry` object from a string containing a IORegistry entry's path.
+
+Here is an example in which an `IOEntry` object is initialised using the registry path to the system nvram and then the "boot-arg" value is retrived from it:
+
+```swift
+
+import TINUIORegistry
+
+let nvram = IOEntry(fromRegistryPath: "IODeviceTree:/options", plane: .service)
+
+let boot_args = nvram?.getString(forKey: "boot-args") ?? "[Fail]"
+
+print(boot_args)
+
+```
 
 # Who should use this Library?
 

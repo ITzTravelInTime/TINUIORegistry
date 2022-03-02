@@ -18,7 +18,7 @@ while iterator.next(){
     
     //print(name)
     
-    if name != "TMR" && name != "RTC"{
+    if name != "TMR" && name != "RTC" && name != "RTC0" && name != "RTC1"{
         continue
     }
     
