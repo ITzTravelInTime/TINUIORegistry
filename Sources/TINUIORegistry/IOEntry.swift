@@ -253,6 +253,24 @@ public class IOEntry{
         return String(data: data, encoding: .ascii)
     }
     
+    ///Returns the specified data property, if it exists in the entry's property table, encoded as the specified Integer type (if possible), otherwise nil is returned.
+    public func getIntegerData<T: FixedWidthInteger>(forKey key: String) -> T?{
+        guard let data = getData(forKey: key) else{
+            return nil
+        }
+        
+        if data.count != MemoryLayout<T>.size{
+            return nil
+        }
+        
+        let ret = Data(data).withUnsafeBytes({
+            (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(as: T.self)
+        })
+                    
+        return ret
+    }
+    
     /*
     public func setProperty(forKey key: String, value: CFTypeRef!) -> Bool{
         assert(!Sandbox.isEnabled, "IOKit write functions works only for non-sandboxed apps")
