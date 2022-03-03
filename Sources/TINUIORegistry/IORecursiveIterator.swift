@@ -10,6 +10,7 @@ import Foundation
 #if os(macOS)
 import IOKit
 
+///type used to perform recursive iterations trought the IORegistry tree structure
 public class IORecursiveIterator {
     private var child: io_registry_entry_t
     private var iterator: io_iterator_t
@@ -39,6 +40,7 @@ public class IORecursiveIterator {
         }
     }
     
+    ///The current entry pointed by the recursive iteration
     public var entry: IOEntry?{
         if memEntry != nil{
             return memEntry
@@ -53,6 +55,7 @@ public class IORecursiveIterator {
         return memEntry
     }
     
+    ///Makes the recursive iteration go to the next step
     public func next() -> Bool{
         child = IOIteratorNext(iterator)
         memEntry = nil
@@ -60,6 +63,7 @@ public class IORecursiveIterator {
         return child != 0
     }
     
+    ///Gets the parent entry of the current entry pointed by the iteration process
     public func parent() -> io_registry_entry_t?{
         var parent: io_registry_entry_t = 0
         IORegistryEntryGetParentEntry(child, kIOServicePlane, &parent)
@@ -71,6 +75,7 @@ public class IORecursiveIterator {
         return parent
     }
     
+    ///Resets the iteration process to the beginning
     public func reset(){
         IOObjectRelease(child)
         child = 0

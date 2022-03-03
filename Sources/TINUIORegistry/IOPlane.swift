@@ -20,6 +20,7 @@ import IOKit
  public var kIOUSBPlane: String { get }
  */
 
+///Used to represent the IORegistry planes
 public enum IOPlane: String, Equatable, CaseIterable, RawRepresentable{
     case service
     case audio

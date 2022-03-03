@@ -11,6 +11,7 @@ import Foundation
 
 import IOKit
 
+///Type used to interact with registry entries
 public class IOEntry{
     private let value: io_registry_entry_t
     private let options: IOOptionBits
@@ -20,6 +21,7 @@ public class IOEntry{
     private var memParent: IOEntry? = nil
     private var memChild: IOEntry? = nil
     
+    ///Initializes a new instance from a registry entry path
     public convenience init?(fromRegistryPath path: String, options: IOOptionBits = 0, plane: IOPlane = .service){
         let entry = IORegistryEntryFromPath(IOServiceGetMatchingService(kIOMasterPortDefault, nil), path)
         
@@ -29,6 +31,7 @@ public class IOEntry{
         
         self.init(value: entry, options: options, plane: plane)
     }
+    
     
     internal required init?(value: io_registry_entry_t, options: IOOptionBits = 0, avoidRelease: Bool = false, plane: IOPlane = .service) {
         if value == 0 || value == MACH_PORT_NULL{
@@ -46,6 +49,7 @@ public class IOEntry{
         }
     }
     
+    ///Gets the IORegistryEntry name for the current instance
     public func getEntryName(usingPlane: Bool = false) -> String?{
         let pathName = UnsafeMutablePointer<io_string_t>.allocate(capacity: 1);
                             
@@ -64,6 +68,7 @@ public class IOEntry{
         return String(cString: int8NamePointer)
     }
     
+    ///If the entry has a name property, encoded either as data or as a string this function returns it, otherwise nil is returned.
     public func getNameProperty() -> String?{
         if var name = getString(forKey: "name"){
             if name.last == "\0"{
@@ -84,6 +89,7 @@ public class IOEntry{
         return nil
     }
     
+    ///Gets the main name for the current entry, either the IORegistry name or the name property value
     public func getName() -> String?{
         if let name = getEntryName(){
             return name
@@ -100,12 +106,12 @@ public class IOEntry{
         return nil
     }
     
-    
-    
+    ///Returns the IORegistry path of the entry
     public func getPath() -> String?{
         return value.getPath(relativeTo: plane)
     }
         
+    ///Returns the parent entry of the current entry
     public var parentEntry: IOEntry?{
         
         if memParent != nil{
@@ -127,6 +133,7 @@ public class IOEntry{
         return memParent
     }
     
+    ///Returns the first child entry of the current entry
     public var firstChildEntry: IOEntry?{
         
         if memChild != nil{
@@ -148,6 +155,7 @@ public class IOEntry{
         return memChild
     }
     
+    ///Returns the complete property table of the current entry, including the values
     public func getPropertyTable() -> [String: Any]?{
         var tdict: Unmanaged<CFMutableDictionary>? = nil
         
@@ -172,7 +180,7 @@ public class IOEntry{
         return ret
     }
     
-    ///reads a generic property from the entry
+    ///Returns the specified property, if it exists in the entry's property table, otherwise nil is returned.
     public func getProperty(forKey key: String) -> CFTypeRef?{
         guard let property = IORegistryEntryCreateCFProperty(self.value, NSString(string: key), kCFAllocatorDefault, options) else{
             return nil
@@ -185,6 +193,7 @@ public class IOEntry{
         return ret
     }
     
+    ///Returns all the properties of the same type for the specified set of property names, if at least one of the properties is not found, nil is returned
     public func getTypeProperties<T: CFTypeRef>(forKeys keys: [String]) -> [String: T]?{
         var ret = [String: T]()
         
@@ -199,17 +208,17 @@ public class IOEntry{
         return ret
     }
 
-    ///Gets an integer property from the entry
+    ///Returns the specified interger property, if it exists in the entry's property table, otherwise nil is returned.
     public func getInteger<T: FixedWidthInteger>(forKey key: String) -> T?{
         return getProperty(forKey: key) as? T
     }
 
-    ///Gets a bool property from the entry
+    ///Returns the specified bool property, if it exists in the entry's property table, otherwise nil is returned.
     public func getBool(forKey key: String) -> Bool?{
         return  getProperty(forKey: key) as? CBool
     }
     
-    ///Gets a data property from the entry
+    ///Returns the specified data property, if it exists in the entry's property table, otherwise nil is returned.
     public func getData(forKey key: String) -> Data?{
         guard let obj = getProperty(forKey: key) else{
             return nil
@@ -222,6 +231,7 @@ public class IOEntry{
         return Data(referencing: data)
     }
 
+    ///Returns the specified string property, if it exists in the entry's property table, otherwise nil is returned.
     public func getString(forKey key: String) -> String?{
         guard let obj = getProperty(forKey: key) else{
             return nil
@@ -234,6 +244,7 @@ public class IOEntry{
         return String(str)
     }
     
+    ///Returns the specified data property, if it exists in the entry's property table, encoded as a string, otherwise nil is returned.
     public func getStringData(forKey key: String) -> String?{
         guard let data = getData(forKey: key) else{
             return nil
@@ -242,6 +253,7 @@ public class IOEntry{
         return String(data: data, encoding: .ascii)
     }
     
+    /*
     public func setProperty(forKey key: String, value: CFTypeRef!) -> Bool{
         assert(!Sandbox.isEnabled, "IOKit write functions works only for non-sandboxed apps")
         
@@ -278,7 +290,7 @@ public class IOEntry{
     ///Sets an integer value into the entry
     public func setInteger<T: FixedWidthInteger>(forKey key: String, value: T) -> Bool {
         return setProperty(forKey: key, value: NSNumber(nonretainedObject: String(value).uInt64Value))
-    }
+    }*/
 }
 
 #endif

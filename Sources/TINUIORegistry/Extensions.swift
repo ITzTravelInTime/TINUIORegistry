@@ -90,6 +90,7 @@ internal extension String{
 import IOKit
 
 public extension io_registry_entry_t{
+    ///Returns the registry path of the current entry
     func getPath(relativeTo plane: IOPlane) -> String?{
         let pathName = UnsafeMutablePointer<io_string_t>.allocate(capacity: 1);
                             
@@ -102,6 +103,7 @@ public extension io_registry_entry_t{
         return String(cString: int8NamePointer)
     }
     
+    ///Returns a new entry instance referencing the parent entry to the current one
     func getParentEntry(relativeTo plane: IOPlane) -> Self?{
         var entry: io_registry_entry_t = 0
         
@@ -112,6 +114,7 @@ public extension io_registry_entry_t{
         return entry
     }
     
+    ///Returns a new entry instance referencing the first child entry of the current entry (if applicable)
     func getFirstChildEntry(relativeTo plane: IOPlane) -> Self?{
         var entry: io_registry_entry_t = 0
         
