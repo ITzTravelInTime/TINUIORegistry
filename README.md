@@ -35,7 +35,7 @@ for item in list{
 
 ```
 
-**Iterating trought the IORegistry entries**
+**Iterating trought the IORegistry entries:**
 
 This feature allows for recursive iteration trought the IORegistry tree structure entry by entry.
 
@@ -72,7 +72,7 @@ while iterator.next(){ //executes the iterations
 
 ```
 
-**Using specific IORegistry entries**
+**Using specific IORegistry entries:**
 
 It's possible to interact with registry entries by initializing a new `IOEntry` object from a string containing a IORegistry entry's path.
 
