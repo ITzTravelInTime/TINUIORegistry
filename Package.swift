@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "TINUIOKit",
+    name: "TINUIORegistry",
     platforms: [
         .macOS("10.9")
     ],
