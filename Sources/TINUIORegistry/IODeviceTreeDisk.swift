@@ -62,7 +62,7 @@ public struct IODeviceTreeDisk: DiskProtocol{
                 continue
             }
             
-            let name = iterator.entry?.getString(forKey: "FullName")
+            let name = iterator.entry?.getString(forKey: "FullName") ?? iterator.entry?.getName()
             
             var uuid: UUID? = nil
             
