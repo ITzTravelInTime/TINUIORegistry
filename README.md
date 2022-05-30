@@ -3,7 +3,7 @@ A Swift library to access information from the IORegistry.
 
 # Features and usage
 
-**Reding the NVRAM:**
+**Reading the NVRAM:**
 
 This feature allows you to access the system NVRAM to gather values, here is an exmaple: 
 
