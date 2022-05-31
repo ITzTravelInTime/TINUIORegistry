@@ -11,6 +11,7 @@
  */
 
 import Foundation
+import SwiftPackagesBase
 
 #if os(macOS)
 
@@ -71,7 +72,7 @@ public struct BSDID: Codable, Hashable, Equatable, RawRepresentable{
         var ret = [UInt]()
         
         for n in nums{
-            guard let uintVal = "\(n)".uIntValue else{
+            guard let uintVal: UInt = "\(n)".uIntValue() else{
                 return []
             }
             

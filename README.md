@@ -102,6 +102,10 @@ This code was created for of my [TINU project](https://github.com/ITzTravelInTim
 
 Also having this as it's own library allows for code to be updated separately and so various versions of the main TINU app will be able to be compiled all with the latest version of this library.
 
+## Libraries used:
+
+- [ITzTravelInTime/SwiftPackagesBase](https://github.com/ITzTravelInTime/SwiftPackagesBase) - Created, developed and maintained by ITzTravelInTime
+
 # Credits
 
  - ITzTravelInTime (Pietro Caruso) - Project creator and main developer
