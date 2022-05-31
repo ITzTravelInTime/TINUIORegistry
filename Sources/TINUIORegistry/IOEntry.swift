@@ -18,7 +18,7 @@ import IOKit
 import SwiftPackagesBase
 
 ///Type used to interact with registry entries
-public class IOEntry: FetchProtocolInstance{
+public class IOEntry: FetchProtocolDataInstance{
     private let value: io_registry_entry_t
     private let options: IOOptionBits
     private let avoidRelease: Bool
