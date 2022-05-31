@@ -1,7 +1,9 @@
 import Foundation
+
+#if os(macOS)
 import TINUIORegistry
 
-print(TINUIORegistry.IONVRAM.getString(forKey: "boot-args") ?? "[Fail]")
+print(TINUIORegistry.IONVRAM.getString("boot-args") ?? "[Fail]")
 //print(TINUIORegistry.IODeviceTreeDisk.simpleList())
 
 let iterator = IORecursiveIterator(plane: .service)
@@ -28,3 +30,4 @@ while iterator.next(){
     
     break
 }
+#endif

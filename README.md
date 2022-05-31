@@ -12,7 +12,7 @@ This feature allows you to access the system NVRAM to gather values, here is an 
 ```swift
 import TINUIORegistry
 
-let boot_args = TINUIORegistry.IONVRAM.getString(forKey: "boot-args") ?? "[Fail]"
+let boot_args = TINUIORegistry.IONVRAM.getString("boot-args") ?? "[Fail]"
 
 print(boot_args)
 
@@ -84,7 +84,7 @@ import TINUIORegistry
 
 let nvram = IOEntry(fromRegistryPath: "IODeviceTree:/options", plane: .service)
 
-let boot_args = nvram?.getString(forKey: "boot-args") ?? "[Fail]"
+let boot_args = nvram?.getString("boot-args") ?? "[Fail]"
 
 print(boot_args)
 

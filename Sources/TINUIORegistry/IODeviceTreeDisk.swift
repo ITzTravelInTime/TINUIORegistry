@@ -48,7 +48,7 @@ public struct IODeviceTreeDisk: DiskProtocol{
         var disks = [Self]()
         
         while iterator.next(){
-            guard let bsdNameString = iterator.entry?.getString(forKey: "BSD Name") else{
+            guard let bsdNameString = iterator.entry?.getString("BSD Name") else{
                 continue
             }
             
@@ -58,15 +58,15 @@ public struct IODeviceTreeDisk: DiskProtocol{
             
             let bsdName = BSDID(bsdNameString)
             
-            guard let ejectable = iterator.entry?.getBool(forKey: "Ejectable"), let removable = iterator.entry?.getBool(forKey: "Removable"), let content = iterator.entry?.getString(forKey: "Content"), let size: UInt64 = iterator.entry?.getInteger(forKey: "Size"), let whole = iterator.entry?.getBool(forKey: "Whole"), let writable = iterator.entry?.getBool(forKey: "Writable"), let leaf = iterator.entry?.getBool(forKey: "Leaf") else{
+            guard let ejectable = iterator.entry?.getBool("Ejectable"), let removable = iterator.entry?.getBool("Removable"), let content = iterator.entry?.getString("Content"), let size: UInt64 = iterator.entry?.getInteger("Size"), let whole = iterator.entry?.getBool("Whole"), let writable = iterator.entry?.getBool("Writable"), let leaf = iterator.entry?.getBool("Leaf") else{
                 continue
             }
             
-            let name = iterator.entry?.getString(forKey: "FullName") ?? iterator.entry?.getName()
+            let name = iterator.entry?.getString("FullName") ?? iterator.entry?.getName()
             
             var uuid: UUID? = nil
             
-            if let tuuid = iterator.entry?.getString(forKey: "UUID"){
+            if let tuuid = iterator.entry?.getString("UUID"){
                 uuid = UUID(uuidString: tuuid)
             }
             

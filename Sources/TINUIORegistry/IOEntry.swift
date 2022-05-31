@@ -15,9 +15,10 @@ import Foundation
 #if os(macOS)
 
 import IOKit
+import SwiftPackagesBase
 
 ///Type used to interact with registry entries
-public class IOEntry{
+public class IOEntry: FetchProtocolInstance{
     private let value: io_registry_entry_t
     private let options: IOOptionBits
     private let avoidRelease: Bool
@@ -75,7 +76,7 @@ public class IOEntry{
     
     ///If the entry has a name property, encoded either as data or as a string this function returns it, otherwise nil is returned.
     public func getNameProperty() -> String?{
-        if var name = getString(forKey: "name"){
+        if var name = getString("name"){
             if name.last == "\0"{
                 name.removeLast()
             }
@@ -83,7 +84,7 @@ public class IOEntry{
             return name
         }
         
-        if var name = getStringData(forKey: "name"){
+        if var name = getStringData("name"){
             if name.last == "\0"{
                 name.removeLast()
             }
@@ -168,7 +169,9 @@ public class IOEntry{
             return nil
         }
         
-        guard let dict: NSDictionary = tdict?.takeRetainedValue() else{
+        //TODO: Test for memory leaks
+        
+        guard let dict: NSDictionary = tdict?.takeUnretainedValue() else{
             //tdict?.release()
             return nil
         }
@@ -186,24 +189,25 @@ public class IOEntry{
     }
     
     ///Returns the specified property, if it exists in the entry's property table, otherwise nil is returned.
-    public func getProperty(forKey key: String) -> CFTypeRef?{
+    public func getProperty(_ key: String) -> CFTypeRef?{
         guard let property = IORegistryEntryCreateCFProperty(self.value, NSString(string: key), kCFAllocatorDefault, options) else{
             return nil
         }
         
-        let ret: CFTypeRef? = property.takeRetainedValue()//.copy() as CFTypeRef
+        //TODO: Test for memory leaks
         
+        let ret: CFTypeRef? = property.takeUnretainedValue()//.copy() as CFTypeRef
         //property.release()
         
         return ret
     }
     
     ///Returns all the properties of the same type for the specified set of property names, if at least one of the properties is not found, nil is returned
-    public func getTypeProperties<T: CFTypeRef>(forKeys keys: [String]) -> [String: T]?{
+    public func getTypeProperties<T: CFTypeRef>(_ keys: [String]) -> [String: T]?{
         var ret = [String: T]()
         
         for i in keys{
-            guard let property = getProperty(forKey: i) as? T else{
+            guard let property = getProperty(i) as? T else{
                 return nil
             }
             
@@ -214,18 +218,18 @@ public class IOEntry{
     }
 
     ///Returns the specified interger property, if it exists in the entry's property table, otherwise nil is returned.
-    public func getInteger<T: FixedWidthInteger>(forKey key: String) -> T?{
-        return getProperty(forKey: key) as? T
+    public func getInteger<T: FixedWidthInteger>(_ key: String) -> T?{
+        return getProperty(key) as? T
     }
 
     ///Returns the specified bool property, if it exists in the entry's property table, otherwise nil is returned.
-    public func getBool(forKey key: String) -> Bool?{
-        return  getProperty(forKey: key) as? CBool
+    public func getBool(_ key: String) -> Bool?{
+        return  getProperty(key) as? CBool
     }
     
     ///Returns the specified data property, if it exists in the entry's property table, otherwise nil is returned.
-    public func getData(forKey key: String) -> Data?{
-        guard let obj = getProperty(forKey: key) else{
+    public func getData(_ key: String) -> Data?{
+        guard let obj = getProperty(key) else{
             return nil
         }
         
@@ -237,8 +241,8 @@ public class IOEntry{
     }
 
     ///Returns the specified string property, if it exists in the entry's property table, otherwise nil is returned.
-    public func getString(forKey key: String) -> String?{
-        guard let obj = getProperty(forKey: key) else{
+    public func getString(_ key: String) -> String?{
+        guard let obj = getProperty(key) else{
             return nil
         }
         
@@ -250,8 +254,8 @@ public class IOEntry{
     }
     
     ///Returns the specified data property, if it exists in the entry's property table, encoded as a string, otherwise nil is returned.
-    public func getStringData(forKey key: String) -> String?{
-        guard let data = getData(forKey: key) else{
+    public func getStringData(_ key: String) -> String?{
+        guard let data = getData(key) else{
             return nil
         }
         
@@ -259,8 +263,8 @@ public class IOEntry{
     }
     
     ///Returns the specified data property, if it exists in the entry's property table, encoded as the specified Integer type (if possible), otherwise nil is returned.
-    public func getIntegerData<T: FixedWidthInteger>(forKey key: String) -> T?{
-        guard let data = getData(forKey: key) else{
+    public func getIntegerData<T: FixedWidthInteger>(_ key: String) -> T?{
+        guard let data = getData(key) else{
             return nil
         }
         
