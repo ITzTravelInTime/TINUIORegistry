@@ -1,7 +1,7 @@
 # TINUIORegistry
 A Swift library to access information from the IORegistry.
 
-# Features and usage
+## Features and usage
 
 **Reading the NVRAM:**
 
@@ -90,13 +90,13 @@ print(boot_args)
 
 ```
 
-# Who should use this Library?
+## Who should use this Library?
 
 This library should be used by swift apps/programs for macOS that needs to retrive information from the IORegistry.
 
 This code is intended for macOS only since it requires the system library 'IOKit'.
 
-# About the project
+## About the project
 
 This code was created for of my [TINU project](https://github.com/ITzTravelInTime/TINU) and it has been made into it's own library to make the main project's source less complex and more focused on it's aim. 
 
@@ -106,15 +106,15 @@ Also having this as it's own library allows for code to be updated separately an
 
 - [ITzTravelInTime/SwiftPackagesBase](https://github.com/ITzTravelInTime/SwiftPackagesBase) - Created, developed and maintained by ITzTravelInTime
 
-# Credits
+## Credits
 
  - ITzTravelInTime (Pietro Caruso) - Project creator and main developer
 
-# Contacts
+## Contacts
 
  - ITzTravelInTime (Pietro Caruso): piecaruso97@gmail.com
 
-# Legal info
+## Legal info
 
 TINUNotifications: A library for sandbox-friendly retrival of information about disks and partitions present in the current macOS system.
 Copyright (C) 2022 Pietro Caruso
