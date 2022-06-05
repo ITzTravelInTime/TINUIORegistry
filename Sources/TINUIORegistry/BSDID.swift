@@ -158,7 +158,7 @@ public struct BSDID: Codable, Hashable, Equatable, RawRepresentable{
             return nil
         }
         
-        return UInt(str[1])
+        return str[1].uIntValue()
     }
     
 }
