@@ -169,19 +169,22 @@ public class IOEntry: FetchProtocolDataInstance{
             return nil
         }
         
+        /*
         defer {
             tdict?.release()
         }
+        */
         
         //TODO: Test for memory leaks
         
-        guard let dict: NSDictionary = tdict?.takeUnretainedValue() else{
+        guard let dict: NSDictionary = tdict?.takeUnretainedValue()  else{
             //tdict?.release()
             return nil
         }
         
-        let dictionary = dict//NSDictionary(dictionary: dict)
-        //tdict?.release()
+        let dictionary = dict.copy() as! NSDictionary
+        
+        tdict?.release()
         
         var ret: [String: Any] = [:]
         
@@ -198,14 +201,11 @@ public class IOEntry: FetchProtocolDataInstance{
             return nil
         }
         
-        defer {
-            property.release()
-        }
-        
         //TODO: Test for memory leaks
         
-        let ret: CFTypeRef? = property.takeUnretainedValue()//.copy() as CFTypeRef
-        //property.release()
+        let ret: CFTypeRef = (property.takeUnretainedValue() as CFTypeRef).copy() as CFTypeRef
+        
+        property.release()
         
         return ret
     }
