@@ -177,14 +177,14 @@ public class IOEntry: FetchProtocolDataInstance{
         
         //TODO: Test for memory leaks
         
-        guard let dict: NSDictionary = tdict?.takeUnretainedValue()  else{
+        guard let dict: NSDictionary = tdict?.takeRetainedValue()  else{
             //tdict?.release()
             return nil
         }
         
         let dictionary = dict.copy() as! NSDictionary
         
-        tdict?.release()
+        //tdict?.release()
         
         var ret: [String: Any] = [:]
         
@@ -203,9 +203,9 @@ public class IOEntry: FetchProtocolDataInstance{
         
         //TODO: Test for memory leaks
         
-        let ret: CFTypeRef = (property.takeUnretainedValue() as CFTypeRef).copy() as CFTypeRef
+        let ret: CFTypeRef = (property.takeRetainedValue() as CFTypeRef).copy() as CFTypeRef
         
-        property.release()
+        //property.release()
         
         return ret
     }
