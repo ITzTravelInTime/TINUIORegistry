@@ -43,6 +43,8 @@ public class IORecursiveIterator {
         if IOIteratorIsValid(iterator) != 0{
             reset()
         }
+        IOObjectRelease(child)
+        IOObjectRelease(iterator)
     }
     
     ///The current entry pointed by the recursive iteration
@@ -68,6 +70,11 @@ public class IORecursiveIterator {
         return child != 0
     }
     
+    @available(macOS, obsoleted: 10.9, message: "This method has been removed due to memory management issues, please use `entry?.parentEntry` instead.")
+    public func parent() -> io_registry_entry_t?{
+        return nil
+    }
+    /*
     ///Gets the parent entry of the current entry pointed by the iteration process
     public func parent() -> io_registry_entry_t?{
         var parent: io_registry_entry_t = 0
@@ -79,6 +86,7 @@ public class IORecursiveIterator {
         
         return parent
     }
+    */
     
     ///Resets the iteration process to the beginning
     public func reset(){

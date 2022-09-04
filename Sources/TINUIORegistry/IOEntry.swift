@@ -169,6 +169,10 @@ public class IOEntry: FetchProtocolDataInstance{
             return nil
         }
         
+        defer {
+            tdict?.release()
+        }
+        
         //TODO: Test for memory leaks
         
         guard let dict: NSDictionary = tdict?.takeUnretainedValue() else{
@@ -192,6 +196,10 @@ public class IOEntry: FetchProtocolDataInstance{
     public func getProperty(_ key: String) -> CFTypeRef?{
         guard let property = IORegistryEntryCreateCFProperty(self.value, NSString(string: key), kCFAllocatorDefault, options) else{
             return nil
+        }
+        
+        defer {
+            property.release()
         }
         
         //TODO: Test for memory leaks
