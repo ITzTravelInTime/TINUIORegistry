@@ -116,7 +116,7 @@ Also having this as it's own library allows for code to be updated separately an
 
 ## Legal info
 
-TINUNotifications: A library for sandbox-friendly retrival of information about disks and partitions present in the current macOS system.
+TINUNotifications: A Swift library to access information from the IORegistry in a Swift-friendly easy-to-use way.
 Copyright (C) 2022 Pietro Caruso
 
 This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
