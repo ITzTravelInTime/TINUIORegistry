@@ -12,27 +12,19 @@
 
 import Foundation
 
-#if os(macOS) || targetEnvironment(macCatalyst)
-
-/*
-///This class manages program sandbox detection code
-internal final class Sandbox{
-    
-    ///Detects is the current program is running as sandboxed
-    internal static var isEnabled: Bool {
-        //Uses a static value to avoid repeting the detection code for each call of the variable
-        struct MEM{
-            static var state: Bool! = nil
+internal final class MemoryManagement{
+    @inline(__always) public class func getString(bufferSize: size_t, encoding: String.Encoding = .ascii, _ function: (_ :UnsafeMutablePointer<CChar>) -> Bool) -> String?{
+        
+        var cString: [CChar] = .init(repeating: 0, count: 1024)
+        defer{
+            cString.removeAll()
         }
         
-        if MEM.state == nil{
-            MEM.state = ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
-            //print("Is Sandbox enabled? \(boolToPrettyStr(MEM.state!))")
+        if !function(&cString){
+            return nil
         }
         
-        return MEM.state
+        return String(cString: &cString, encoding: encoding)
     }
-    
-}*/
+}
 
-#endif

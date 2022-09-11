@@ -11,9 +11,10 @@
  */
 
 import Foundation
-import SwiftPackagesBase
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
+
+import SwiftPackagesBase
 
 ///Type used to represent BSD device names for storage devices
 public struct BSDID: Codable, Hashable, Equatable, RawRepresentable{

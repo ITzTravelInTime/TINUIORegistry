@@ -1,10 +1,10 @@
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
 import XCTest
 @testable import TINUIORegistry
 
 final class TINUIORegistryTests: XCTestCase {
-    func testExample() throws {
+    func testFetch() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
@@ -30,7 +30,7 @@ final class TINUIORegistryTests: XCTestCase {
                 continue
             }
             
-            for i in entry.getPropertyTable() ?? [:]{
+            for i in entry.getRawPropertyTable() ?? [:]{
                 print(i)
             }
             

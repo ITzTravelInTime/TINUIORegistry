@@ -12,9 +12,9 @@
 
 import Foundation
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
 
 ///NVRAM registry entry
-public let IONVRAM = IOEntry(fromRegistryPath: "IODeviceTree:/options", plane: .service)!
+public let IONVRAM = IOEntry(fromRegistryPath: "IODeviceTree:/options", plane: .deviceTree)!
 
 #endif

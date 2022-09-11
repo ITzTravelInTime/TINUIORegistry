@@ -11,22 +11,16 @@
  */
 import Foundation
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
 
 import IOKit
 
 public extension io_registry_entry_t{
     ///Returns the registry path of the current entry
     func getPath(relativeTo plane: IOPlane) -> String?{
-        let pathName = UnsafeMutablePointer<io_string_t>.allocate(capacity: 1);
-                            
-        let int8NamePointer = UnsafeMutableRawPointer(pathName).bindMemory(to: Int8.self,capacity: 1)
-                            
-        if IORegistryEntryGetPath(self, plane.iOKitName, int8NamePointer) != kIOReturnSuccess{
-            return nil
-        }
-        
-        return String(cString: int8NamePointer)
+        return MemoryManagement.getString(bufferSize: 1024, { cString in
+            return IORegistryEntryGetPath(self, plane.iOKitName, cString) == kIOReturnSuccess
+        })
     }
     
     ///Returns a new entry instance referencing the parent entry to the current one

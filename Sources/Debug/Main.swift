@@ -12,27 +12,16 @@
 
 import Foundation
 
-#if os(macOS) || targetEnvironment(macCatalyst)
-
-/*
-///This class manages program sandbox detection code
-internal final class Sandbox{
-    
-    ///Detects is the current program is running as sandboxed
-    internal static var isEnabled: Bool {
-        //Uses a static value to avoid repeting the detection code for each call of the variable
-        struct MEM{
-            static var state: Bool! = nil
-        }
+@main class Main{
+    static func main(){
         
-        if MEM.state == nil{
-            MEM.state = ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
-            //print("Is Sandbox enabled? \(boolToPrettyStr(MEM.state!))")
-        }
         
-        return MEM.state
+        //#if DEBUG
+        for debug in Debugs.list{
+            debug()
+        }
+        //#endif
+        
+        return
     }
-    
-}*/
-
-#endif
+}

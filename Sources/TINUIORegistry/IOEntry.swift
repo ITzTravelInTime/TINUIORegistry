@@ -12,7 +12,7 @@
 
 import Foundation
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
 
 import IOKit
 import SwiftPackagesBase
@@ -53,25 +53,26 @@ public class IOEntry: FetchProtocolDataInstance{
         if !avoidRelease{
             IOObjectRelease(value)
         }
+        memChild = nil
+        memParent = nil
     }
     
     ///Gets the IORegistryEntry name for the current instance
     public func getEntryName(usingPlane: Bool = false) -> String?{
-        let pathName = UnsafeMutablePointer<io_string_t>.allocate(capacity: 1);
-                            
-        let int8NamePointer = UnsafeMutableRawPointer(pathName).bindMemory(to: Int8.self,capacity: 1)
-        
-        if usingPlane{
-            if IORegistryEntryGetNameInPlane(value, plane.iOKitName, int8NamePointer) != kIOReturnSuccess{
-                return nil
+        return MemoryManagement.getString(bufferSize: 1024, { cString in
+            if usingPlane{
+                if IORegistryEntryGetNameInPlane(value, plane.iOKitName, cString) != kIOReturnSuccess{
+                    return false
+                }
+            }else{
+                if IORegistryEntryGetName(value, cString) != kIOReturnSuccess{
+                    return false
+                }
             }
-        }else{
-            if IORegistryEntryGetName(value, int8NamePointer) != kIOReturnSuccess{
-                return nil
-            }
-        }
+            
+            return true
+        })
         
-        return String(cString: int8NamePointer)
     }
     
     ///If the entry has a name property, encoded either as data or as a string this function returns it, otherwise nil is returned.
@@ -161,65 +162,88 @@ public class IOEntry: FetchProtocolDataInstance{
         return memChild
     }
     
-    ///Returns the complete property table of the current entry, including the values
+    @available(*, deprecated, renamed: "getRawPropertyTable" )
     public func getPropertyTable() -> [String: Any]?{
+        return getRawPropertyTable()
+    }
+    
+    ///Returns the complete property table of the current entry, including the values
+    public func getRawPropertyTable() -> [String: Any]?{
         var tdict: Unmanaged<CFMutableDictionary>? = nil
         
         if IORegistryEntryCreateCFProperties(value, &tdict, kCFAllocatorDefault, options) != kIOReturnSuccess{
             return nil
         }
         
-        /*
-        defer {
-            tdict?.release()
-        }
-        */
-        
-        //TODO: Test for memory leaks
-        
         guard let dict: NSDictionary = tdict?.takeRetainedValue()  else{
-            //tdict?.release()
             return nil
         }
         
-        let dictionary = dict.copy() as! NSDictionary
-        
-        //tdict?.release()
-        
         var ret: [String: Any] = [:]
         
-        for (_, obj) in dictionary.enumerated(){
+        for (_, obj) in dict.enumerated(){
             ret["\(obj.key)"] = obj.value
         }
         
         return ret
     }
     
-    ///Returns the specified property, if it exists in the entry's property table, otherwise nil is returned.
+    @available(*, deprecated, renamed: "getRawProperty" )
     public func getProperty(_ key: String) -> CFTypeRef?{
-        guard let property = IORegistryEntryCreateCFProperty(self.value, NSString(string: key), kCFAllocatorDefault, options) else{
-            return nil
+        return getRawProperty(key)
+    }
+    
+    ///Returns the specified property, if it exists in the entry's property table, otherwise nil is returned.
+    public func getRawProperty(_ key: String) -> CFTypeRef?{
+        
+        let namePointer = UnsafeMutablePointer<NSString>.allocate(capacity: 1)
+        defer{
+            namePointer.deallocate()
         }
         
-        //TODO: Test for memory leaks
+        namePointer.pointee = NSString(string: key)
         
-        let ret: CFTypeRef = (property.takeRetainedValue() as CFTypeRef).copy() as CFTypeRef
+        var ret: CFTypeRef? = nil
         
-        //property.release()
+        ret = IORegistryEntryCreateCFProperty(self.value, namePointer.pointee, kCFAllocatorDefault, options)?.takeRetainedValue()
         
         return ret
     }
     
-    ///Returns all the properties of the same type for the specified set of property names, if at least one of the properties is not found, nil is returned
+    @available(*, deprecated, renamed: "getRawPropertyTableOfTypeFiltered" )
     public func getTypeProperties<T: CFTypeRef>(_ keys: [String]) -> [String: T]?{
+        return getRawPropertyTableOfTypeFiltered(list: keys, returnsNilIfListedPropertiesAreMissing: true)
+    }
+    
+    ///Returns all of the properties in the IOEntry's property table that are of the type specified by the reciever that are also included into the list.
+    ///
+    ///     Returns: `nil` if the property table can't be fetched or the `returnsNilIfListedPropertiesAreMissing` parameter is set to `true` and entries from the `list` parameter are missing from the raw property table. An empty dictionary is returned if there isn't any property of the specified Type in the table.
+    public func getRawPropertyTableOfTypeFiltered<T: CFTypeRef>(list keys: [String], returnsNilIfListedPropertiesAreMissing: Bool = true) -> [String: T]?{
+        
+        guard let table: [String: T] = getRawPropertyTableOfType() else { return nil }
+        
+        if keys.filter({ table.keys.contains($0) }).isEmpty && returnsNilIfListedPropertiesAreMissing{
+            return nil
+        }
+        
+        return table.filter({ keys.contains( $0.key ) })
+    }
+    
+    ///Returns all of the properties in the IOEntry's property table that are of the type specified by the reciever.
+    ///
+    ///     Returns: `nil` if the property table can't be fetched and an empty dictionary if there isn't any property of the specified Type in the table.
+    public func getRawPropertyTableOfType<T: CFTypeRef>() -> [String: T]?{
+        
+        guard let table = getRawPropertyTable() else { return nil }
+        
         var ret = [String: T]()
         
-        for i in keys{
-            guard let property = getProperty(i) as? T else{
-                return nil
+        for i in table {
+            guard let property = i.value as? T else{
+                continue
             }
             
-            ret[i] = property
+            ret[i.key] = property
         }
         
         return ret
@@ -227,17 +251,17 @@ public class IOEntry: FetchProtocolDataInstance{
 
     ///Returns the specified interger property, if it exists in the entry's property table, otherwise nil is returned.
     public func getInteger<T: FixedWidthInteger>(_ key: String) -> T?{
-        return getProperty(key) as? T
+        return getRawProperty(key) as? T
     }
 
     ///Returns the specified bool property, if it exists in the entry's property table, otherwise nil is returned.
     public func getBool(_ key: String) -> Bool?{
-        return  getProperty(key) as? CBool
+        return  getRawProperty(key) as? CBool
     }
     
     ///Returns the specified data property, if it exists in the entry's property table, otherwise nil is returned.
     public func getData(_ key: String) -> Data?{
-        guard let obj = getProperty(key) else{
+        guard let obj = getRawProperty(key) else{
             return nil
         }
         
@@ -250,7 +274,7 @@ public class IOEntry: FetchProtocolDataInstance{
 
     ///Returns the specified string property, if it exists in the entry's property table, otherwise nil is returned.
     public func getString(_ key: String) -> String?{
-        guard let obj = getProperty(key) else{
+        guard let obj = getRawProperty(key) else{
             return nil
         }
         

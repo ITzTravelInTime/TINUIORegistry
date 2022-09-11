@@ -12,7 +12,7 @@
 
 import Foundation
 
-#if os(macOS)
+#if os(macOS)  || targetEnvironment(macCatalyst)
 
 public protocol DiskPointer: Codable, Equatable{
     var DeviceIdentifier: BSDID { get }

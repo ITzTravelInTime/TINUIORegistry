@@ -12,7 +12,8 @@
 
 import Foundation
 
-#if os(macOS)
+#if os(macOS) || targetEnvironment(macCatalyst)
+
 public struct IODeviceTreeDisk: DiskProtocol{
     ///The disk/partition BSD name, this object provvides useful methods to gather some extra info about this device.
     public var DeviceIdentifier: BSDID

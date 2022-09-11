@@ -63,7 +63,7 @@ while iterator.next(){ //executes the iterations
     }
     
     //gets and prints the property table of the entry
-    for i in entry.getPropertyTable() ?? [:]{
+    for i in entry..getRawPropertyTable() ?? [:]{
         print(i)
     }
     

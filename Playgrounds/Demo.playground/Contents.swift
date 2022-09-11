@@ -24,7 +24,7 @@ while iterator.next(){
         continue
     }
     
-    for i in entry.getPropertyTable() ?? [:]{
+    for i in entry..getRawPropertyTable() ?? [:]{
         print(i)
     }
     
