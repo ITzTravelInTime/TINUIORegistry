@@ -1,5 +1,5 @@
 # TINUIORegistry
-A Swift library to access information from the IORegistry.
+A Swift library to access information from the IORegistry in a Swift-friendly easy-to-use way.
 
 ## Features and usage
 
@@ -63,7 +63,7 @@ while iterator.next(){ //executes the iterations
     }
     
     //gets and prints the property table of the entry
-    for i in entry..getRawPropertyTable() ?? [:]{
+    for i in entry.getRawPropertyTable() ?? [:]{
         print(i)
     }
     
