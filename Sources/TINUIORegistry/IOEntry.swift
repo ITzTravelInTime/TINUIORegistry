@@ -195,16 +195,9 @@ public class IOEntry: FetchProtocolDataInstance{
     ///Returns the specified property, if it exists in the entry's property table, otherwise nil is returned.
     public func getRawProperty(_ key: String) -> CFTypeRef?{
         
-        let namePointer = UnsafeMutablePointer<NSString>.allocate(capacity: 1)
-        defer{
-            namePointer.deallocate()
-        }
-        
-        namePointer.pointee = NSString(string: key)
-        
         var ret: CFTypeRef? = nil
         
-        ret = IORegistryEntryCreateCFProperty(self.value, namePointer.pointee, kCFAllocatorDefault, options)?.takeRetainedValue()
+        ret = IORegistryEntryCreateCFProperty(self.value, NSString(string: key), kCFAllocatorDefault, options)?.takeRetainedValue()
         
         return ret
     }
